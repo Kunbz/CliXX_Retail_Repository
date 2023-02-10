@@ -1,0 +1,6 @@
+projectKey=Clixx-App-KUNBI
+serverUrl=http://52.204.119.142:9000
+serverVersion=7.9.1.27448
+dashboardUrl=http://52.204.119.142:9000/dashboard?id=Clixx-App-KUNBI
+ceTaskId=AYY4REIZUNYOSjlNHD4l
+ceTaskUrl=http://52.204.119.142:9000/api/ce/task?id=AYY4REIZUNYOSjlNHD4l
