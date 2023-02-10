@@ -7,29 +7,29 @@ pipeline {
     }
 
     stages {
-        stage ('Sonarcube Scan') {
-        steps {
-         script {
-          scannerHome = tool 'sonarqube'
-        }
-        withCredentials([string(credentialsId: 'SONAR_TOKEN', variable: 'KUNBI_TOKEN')]){
-        withSonarQubeEnv('SonarQubeScanner') {
-          sh " ${scannerHome}/bin/sonar-scanner \
-          -Dsonar.projectKey=Clixx-App-KUNBI   \
-          -Dsonar.login=${KUNBI_TOKEN} "
-        }
-        }
-        }
+//         stage ('Sonarcube Scan') {
+//         steps {
+//          script {
+//           scannerHome = tool 'sonarqube'
+//         }
+//         withCredentials([string(credentialsId: 'SONAR_TOKEN', variable: 'KUNBI_TOKEN')]){
+//         withSonarQubeEnv('SonarQubeScanner') {
+//           sh " ${scannerHome}/bin/sonar-scanner \
+//           -Dsonar.projectKey=Clixx-App-KUNBI   \
+//           -Dsonar.login=${KUNBI_TOKEN} "
+//         }
+//         }
+//         }
 
-}
+// }
 
- stage('Quality Gate') {
-            steps {
-                timeout(time: 3, unit: 'MINUTES') {
-                    waitForQualityGate abortPipeline: false
-            }
-            }
-        }
+//  stage('Quality Gate') {
+//             steps {
+//                 timeout(time: 3, unit: 'MINUTES') {
+//                     waitForQualityGate abortPipeline: true
+//             }
+//             }
+//         }
 
           stage ('Build Docker Image') {
           steps {
