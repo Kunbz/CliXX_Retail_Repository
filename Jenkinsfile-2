@@ -10,11 +10,11 @@ pipeline {
          script {
           scannerHome = tool 'sonarqube'
         }
-        withCredentials([string(credentialsId: 'SONAR_TOKEN', variable: 'SONAR_TOKEN')]){
+        withCredentials([string(credentialsId: 'SONAR_TOKEN', variable: 'KUNBI_TOKEN')]){
         withSonarQubeEnv('SonarQubeScanner') {
           sh " ${scannerHome}/bin/sonar-scanner \
           -Dsonar.projectKey=Clixx-App-KUNBI   \
-          -Dsonar.login=${SONAR_TOKEN} "
+          -Dsonar.login=${KUNBI_TOKEN} "
         }
         }
         }
