@@ -10,11 +10,11 @@ pipeline {
          script {
           scannerHome = tool 'sonarqube'
         }
-        withCredentials([string(credentialsId: 'SONAR_TOKEN', variable: 'KUNBI_TOKEN')]){
+        withCredentials([string(credentialsId: 'SONAR_TOKEN', variable: 'SONAR_TOKEN')]){
         withSonarQubeEnv('SonarQubeScanner') {
           sh " ${scannerHome}/bin/sonar-scanner \
           -Dsonar.projectKey=Clixx-App-KUNBI   \
-          -Dsonar.login=${KUNBI_TOKEN} "
+          -Dsonar.login=${SONAR_TOKEN} "
         }
         }
         }
@@ -51,6 +51,7 @@ pipeline {
         }
   stage ('Restore CliXX Database') {
           steps {
+            slackSend (color: '#FFFF00', message: "RESTORE CliXX DATABASE -${env.RUNNER} : Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
               sh '''
             python3 -m venv python3-virtualenv
             source python3-virtualenv/bin/activate
@@ -100,6 +101,7 @@ pipeline {
               sh '''
                 aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 925424815348.dkr.ecr.us-east-1.amazonaws.com/clixx-repository
                 docker tag clixx-image:$VERSION 925424815348.dkr.ecr.us-east-1.amazonaws.com/clixx-repository:clixx-image-$VERSION
+                docker tag clixx-image:latest 925424815348.dkr.ecr.us-east-1.amazonaws.com/clixx-repository:clixx-image-$VERSION
                 docker push 925424815348.dkr.ecr.us-east-1.amazonaws.com/clixx-repository:clixx-image-$VERSION
               '''
           }
