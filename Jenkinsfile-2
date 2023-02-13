@@ -55,8 +55,9 @@ pipeline {
               sh '''
             python3 -m venv python3-virtualenv
             source python3-virtualenv/bin/activate
+            python3 -m pip install --upgrade pip
             python3 --version
-            pip3 install boto3 botocore boto
+            pip3 install boto3 botocore boto ansible
             ansible-playbook $WORKSPACE/deploy_db_ansible/deploy_db.yml
             deactivate
               '''
@@ -101,7 +102,6 @@ pipeline {
               sh '''
                 aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 925424815348.dkr.ecr.us-east-1.amazonaws.com/clixx-repository
                 docker tag clixx-image:$VERSION 925424815348.dkr.ecr.us-east-1.amazonaws.com/clixx-repository:clixx-image-$VERSION
-                docker tag clixx-image:latest 925424815348.dkr.ecr.us-east-1.amazonaws.com/clixx-repository:clixx-image-$VERSION
                 docker push 925424815348.dkr.ecr.us-east-1.amazonaws.com/clixx-repository:clixx-image-$VERSION
               '''
           }
