@@ -3,6 +3,7 @@ pipeline {
     environment {
         VERSION = "1.0.${BUILD_NUMBER}"
         PATH = "${PATH}:${getSonarPath()}:${getDockerPath()}"
+        RUNNER = "KUNBI's"      
     }
     stages {
         stage ('Sonarcube Scan') {
@@ -37,6 +38,7 @@ pipeline {
         }
   stage ('Starting Docker Image') {
           steps {
+            slackSend (color: '#FFFF00', message: "Starting the Docker image Pipeline: '${RUNNER}' Job [${env.BUILD_NUMBER}]- ${env.BUILD_URL}")
               sh '''
               if ( docker ps|grep clixx-cont ) then
                  echo "Docker image exists, killing it"
@@ -51,7 +53,7 @@ pipeline {
         }
   stage ('Restore CliXX Database') {
           steps {
-            slackSend (color: '#FFFF00', message: "RESTORE CliXX DATABASE -${env.RUNNER} : Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+            slackSend (color: '#FFFF00', message: "Restore CliXX Database: '${RUNNER}' Job [${env.BUILD_NUMBER}]- ${env.BUILD_URL}")
               sh '''
             python3 -m venv python3-virtualenv
             source python3-virtualenv/bin/activate
@@ -65,6 +67,7 @@ pipeline {
         }
   stage ('Configure DB Instance') {
           steps {
+             slackSend (color: '#FFFF00', message: "Configuring Database Instance: '${RUNNER}' Job [${env.BUILD_NUMBER}]- ${env.BUILD_URL}")
               sh '''
                USERNAME='wordpressuser'
                PASSWORD='W3lcome123'
@@ -79,6 +82,7 @@ pipeline {
         }
       stage ('Tear Down CliXX Docker Image and Database') {
           steps {
+            slackSend (color: '#FFFF00', message: "Tear Down Clixx Docker Image and Database: '${RUNNER}' Job [${env.BUILD_NUMBER}]- ${env.BUILD_URL}")
              script {
                 def userInput = input(id: 'confirm', message: 'Tear Down Environment?', parameters: [ [$class: 'BooleanParameterDefinition', defaultValue: false, description: 'Tear Down Environment?', name: 'confirm'] ])
              }
@@ -96,6 +100,7 @@ pipeline {
         }
         stage ('Log Into ECR and push the newly created Docker') {
           steps {
+            slackSend (color: '#FFFF00', message: "Log Into ECR and push the newly created Docker: '${RUNNER}' Job [${env.BUILD_NUMBER}]- ${env.BUILD_URL}")
              script {
                 def userInput = input(id: 'confirm', message: 'Push Image To ECR?', parameters: [ [$class: 'BooleanParameterDefinition', defaultValue: false, description: 'Push to ECR?', name: 'confirm'] ])
              }
