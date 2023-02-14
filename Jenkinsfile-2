@@ -67,19 +67,29 @@ pipeline {
         }
   stage ('Configure DB Instance') {
           steps {
+            script {
+                def userInput = input(id: 'confirm', message: 'Is the DataBase creation complete?', parameters: [ [$class: 'BooleanParameterDefinition', defaultValue: false, description: 'Complete?', name: 'confirm'] ])
+              }
+              withCredentials([
+                     string(credentialsId: 'user_name', variable: 'USERNAME'),
+                     string(credentialsId: 'pass_word', variable: 'PASSWORD'),
+                     string(credentialsId: 'database_name', variable: 'DBNAME'),
+                     string(credentialsId: 'database_instance', variable: 'SERVER_INSTANCE')
+                     ]) {
              slackSend (color: '#FFFF00', message: "Configuring Database Instance: '${env.RUNNER}' Job [${env.BUILD_NUMBER}]- ${env.BUILD_URL}")
               sh '''
-               USERNAME='wordpressuser'
-               PASSWORD='W3lcome123'
-               DBNAME='wordpressdb'
+               USERNAME="${USERNAME}"
+               PASSWORD="${PASSWORD}"
+               DBNAME="${DBNAME}"
                SERVER_IP=$(curl -s http://checkip.dyndns.org | sed -e 's/.*Current IP Address: //' -e 's/<.*$//')
-               SERVER_INSTANCE='wordpressdbclixxjenkins.ckedvwdjlcc9.us-east-1.rds.amazonaws.com'
+               SERVER_INSTANCE="${SERVER_INSTANCE}"
                echo "use wordpressdb;" >> $WORKSPACE/db.setup
                echo "UPDATE wp_options SET option_value = '$SERVER_IP' WHERE option_value LIKE 'http%';">> $WORKSPACE/db.setup
                mysql -u $USERNAME --password=$PASSWORD -h $SERVER_INSTANCE  -D  $DBNAME < $WORKSPACE/db.setup
               '''
           }
         }
+    }
       stage ('Tear Down CliXX Docker Image and Database') {
           steps {
             slackSend (color: '#FFFF00', message: "Tear Down Clixx Docker Image and Database: '${env.RUNNER}' Job [${env.BUILD_NUMBER}]- ${env.BUILD_URL}")
