@@ -110,14 +110,21 @@ pipeline {
         }
         stage ('Log Into ECR and push the newly created Docker') {
           steps {
-            slackSend (color: '#FFFF00', message: "Log Into ECR and push the newly created Docker: '${env.RUNNER}' Job [${env.BUILD_NUMBER}]- ${env.BUILD_URL}")
-             script {
+            slackSend (color: '#FFFF00', message: "LOGGING INTO ECR AND PUSHING THE NEWLY CREATED DOCKER -${env.RUNNER} : Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")        
+            script {
                 def userInput = input(id: 'confirm', message: 'Push Image To ECR?', parameters: [ [$class: 'BooleanParameterDefinition', defaultValue: false, description: 'Push to ECR?', name: 'confirm'] ])
              }
+                withCredentials([
+                     string(credentialsId: 'ecr_url', variable: 'ecr_url')
+                     ])
+                  {
               sh '''
-                aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 925424815348.dkr.ecr.us-east-1.amazonaws.com/clixx-repository
-                docker tag clixx-image:$VERSION 925424815348.dkr.ecr.us-east-1.amazonaws.com/clixx-repository:clixx-image-$VERSION
-                docker push 925424815348.dkr.ecr.us-east-1.amazonaws.com/clixx-repository:clixx-image-$VERSION
+                 ECR_URL="${ecr_url}"
+                aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $ECR_URL
+                docker tag clixx-image:$VERSION $ECR_URL:clixx-image-$VERSION
+                docker tag clixx-image:$VERSION $ECR_URL:latest
+                docker push $ECR_URL:clixx-image-$VERSION
+                docker push $ECR_URL:latest
               '''
           }
         }
